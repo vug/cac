@@ -1,0 +1,48 @@
+Index,Section,Instrument,Articulation,Short Name
+0,Strings,Violins 1,Long,Violins
+1,Strings,Violins 1,Spiccato,Violins
+2,Strings,Violins 1,Pizzicato,Violins
+3,Strings,Violins 1,Tremolo,Violins
+4,Strings,Violins 2,Long,Violins
+5,Strings,Violins 2,Spiccato,Violins
+6,Strings,Violins 2,Pizzicato,Violins
+7,Strings,Violins 2,Tremolo,Violins
+8,Strings,Violas,Long,Violas
+9,Strings,Violas,Spiccato,Violas
+10,Strings,Violas,Pizzicato,Violas
+11,Strings,Violas,Tremolo,Violas
+12,Strings,Celli,Long,Celli
+13,Strings,Celli,Spiccato,Celli
+14,Strings,Celli,Pizzicato,Celli
+15,Strings,Celli,Tremolo,Celli
+16,Strings,Basses,Long,Basses
+17,Strings,Basses,Spiccato,Basses
+18,Strings,Basses,Pizzicato,Basses
+19,Brass,Horns a4,Long,Horns
+20,Brass,Horns a4,Staccatissimo,Horns
+21,Brass,Trumpets a3,Long,Trumpets
+22,Brass,Trumpets a3,Staccatissimo,Trumpets
+23,Brass,Tenor Trombones a3,Long,TenorTrombones
+24,Brass,Tenor Trombones a3,Staccatissimo,TenorTrombones
+25,Brass,Bass Trombones a2,Long,BassTrombones
+26,Brass,Bass Trombones a2,Staccatissimo,BassTrombones
+27,Brass,Tuba,Long,Tuba
+28,Brass,Tuba,Staccatissimo,Tuba
+29,Woodwinds,Flutes a3,Long,Flutes
+30,Woodwinds,Flutes a3,Staccatissimo,Flutes
+31,Woodwinds,Piccolo,Long,Piccolo
+32,Woodwinds,Piccolo,Staccatissimo,Piccolo
+33,Woodwinds,Oboes a3,Long,Oboes
+34,Woodwinds,Oboes a3,Staccatissimo,Oboes
+35,Woodwinds,Clarinets a3,Long,Clarinets
+36,Woodwinds,Clarinets a3,Staccatissimo,Clarinets
+37,Woodwinds,Bassoons a3,Long,Bassoons
+38,Woodwinds,Bassoons a3,Staccatissimo,Bassoons
+39,Percussion,Harp and Celeste,Harp Plucks,HarpPlucks
+40,Percussion,Harp and Celeste,Celeste,Celeste
+41,Percussion,Percussion,Timpani Hits,TimpaniHits
+42,Percussion,Percussion,Untuned Percussion,UntunedPercussion
+43,Percussion,Tuned Percussion,Tubular Bells,TubularBells
+44,Percussion,Tuned Percussion,Marimba,Marimba
+45,Percussion,Tuned Percussion,Xylophone,Xylophone
+46,Percussion,Tuned Percussion,Glockenspiel,Glockenspiel
