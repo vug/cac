@@ -2,6 +2,8 @@ from collections import deque
 from typing import Callable, List, Tuple
 
 from music21.pitch import Pitch
+from music21.scale import MajorScale
+
 from discoversounds import (
     query_sound,
     Section,
@@ -46,6 +48,29 @@ def get_next_triplets1(curr: Triplet) -> List[Triplet]:
         return []
 
 
+def get_next_triplets(triplet: Triplet) -> List[Triplet]:
+    all_pitches = MajorScale(tonic="C").getPitches("C1", "C8")
+    next_triplets = set()
+    for i, pitch in enumerate(triplet.pitches):
+        # TODO: improve construct_graph to accept negative values here
+        for diff in [1]:
+            # TODO: make this a utility function
+            moved_pitch = all_pitches[all_pitches.index(pitch) + diff]
+            if moved_pitch in triplet.pitches:
+                continue
+            next_pitches = list(triplet.pitches).copy()
+            next_pitches[i] = moved_pitch
+            next_pitches = tuple(next_pitches)
+            if not Pitch("C2") <= next_pitches[0] <= Pitch("C4"):
+                continue
+            if not Pitch("C3") <= next_pitches[1] <= Pitch("C5"):
+                continue
+            if not Pitch("C4") <= next_pitches[2] <= Pitch("C6"):
+                continue
+            next_triplets.add(Triplet(next_pitches))
+    return list(next_triplets)
+
+
 def construct_graph(init: Triplet, next_states_func: Callable, steps: int):
     q = deque([init])
     vertices = set()
@@ -64,7 +89,20 @@ def construct_graph(init: Triplet, next_states_func: Callable, steps: int):
     return G
 
 
+def main3():
+    init_pitches = (Pitch("C2"), Pitch("C3"), Pitch("G3"))
+    init_triplet = Triplet(init_pitches)
+    successors = get_next_triplets(init_triplet)
+    print(init_triplet, successors)
+    G = construct_graph(init_triplet, get_next_triplets1, 2)
+    print(G.edges)
+
+
 if __name__ == "__main__":
+    main3()
+
+
+def main1():
     sounds, _ = midi.initialize()
 
     basses = query_sound(
