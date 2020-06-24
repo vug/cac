@@ -72,6 +72,10 @@ def get_next_triplets(triplet: Triplet) -> List[Triplet]:
     return list(next_triplets)
 
 
+def filter_triplets(curr, successors):
+    pass
+
+
 def construct_graph(init: Triplet, next_states_func: Callable, steps: int):
     q = deque([init])
     vertices = set()
@@ -112,17 +116,20 @@ def plot_graph(G):
 def main():
     init_pitches = (Pitch("C2"), Pitch("C3"), Pitch("C4"))
     init_triplet = Triplet(init_pitches)
-    G = construct_graph(init_triplet, get_next_triplets, 5)
-    print(G.has_node(init_triplet))
-    print(G.edges)
+    G = construct_graph(init_triplet, get_next_triplets, 48)
     plot_graph(G)
 
+    progression = []
+    chord = init_triplet
+    while chord:
+        progression.append(chord)
+        successors = list(G.successors(chord))
+        if successors:
+            chord = successors[len(successors) // 2]
+        else:
+            chord = None
+    print(progression)
 
-if __name__ == "__main__":
-    main()
-
-
-def main1():
     sounds, _ = midi.initialize()
 
     basses = query_sound(
@@ -138,10 +145,45 @@ def main1():
         sounds, Section.STRINGS, Instrument.VIOLINS_1, Articulation.SPICCATO
     )
 
+    tuba = query_sound(
+        sounds, Section.BRASS, Instrument.TUBA, Articulation.STACCATISSIMO
+    )
+    trombones = query_sound(
+        sounds, Section.BRASS, Instrument.TENOR_TROMBONES_A3, Articulation.STACCATISSIMO
+    )
+    trumpets = query_sound(
+        sounds, Section.BRASS, Instrument.TRUMPETS_A3, Articulation.STACCATISSIMO
+    )
+    horns = query_sound(
+        sounds, Section.BRASS, Instrument.HORNS_A4, Articulation.STACCATISSIMO
+    )
+
+    strings = (celli, violas, violins)
+    brass = (trombones, trumpets, horns)
+    dt = 0.175
+    dur = 0.125
+
+    p = Player()
+    for measure, triplet in enumerate(progression):
+        for beat in range(4):
+            for note, snd in zip(triplet.pitches, strings):
+                p.schedule(snd, Pitch(note).midi, (beat + measure * 4) * dt, dur, 100)
+        for note, snd in zip(triplet.pitches, brass):
+            p.schedule(snd, Pitch(note).midi, measure * 4 * dt, dur * 2, 100)
+            p.schedule(snd, Pitch(note).midi, (measure * 4 + 3.25) * dt, dur * 0.5, 100)
+    p.play()
+
+
+if __name__ == "__main__":
+    main()
+
+
+def main1():
+    sounds, _ = midi.initialize()
     p = Player()
     for i, snd in enumerate(sounds[:5]):
-        midi_no = (snd.low_no + snd.high_no) // 2
-        p.schedule(snd, midi_no, i * 0.2, 0.2, 100)
+        middle_no = (snd.low_no + snd.high_no) // 2
+        p.schedule(snd, middle_no, i * 0.2, 0.2, 100)
     p.play()
 
 
@@ -170,3 +212,13 @@ def main3():
     print(init_triplet, successors)
     G = construct_graph(init_triplet, get_next_triplets1, 2)
     print(G.edges)
+
+
+def main4():
+    init_pitches = (Pitch("C2"), Pitch("C3"), Pitch("C4"))
+    init_triplet = Triplet(init_pitches)
+    G = construct_graph(init_triplet, get_next_triplets, 5)
+    print(G.has_node(init_triplet))
+    print(G.edges)
+    plot_graph(G)
+    print(list(G.successors(init_triplet)))
