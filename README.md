@@ -21,7 +21,7 @@ Here an alternatie approach is considered
 
 Graph of a simple voice leading algorithm: "only move one note in a triplet chord one step"
 
-![simple voice leading graph](https://www.dropbox.com/s/e8igeglcdbijwco/simple_voice_leading_graph_big.png?dl=1)
+[simple voice leading graph](https://www.dropbox.com/s/e8igeglcdbijwco/simple_voice_leading_graph_big.png?dl=0)
 
 Simple path: start from the root node and choose middle successor as next state.
 
