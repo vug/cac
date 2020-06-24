@@ -8,6 +8,31 @@ import midi
 from midi import Player
 
 
+class Triplet(object):
+    """A container of 3 Pitches.
+
+    Two different triplets with same pitches have different ids
+    but have same hashes and are equal."""
+
+    def __init__(self, pitches: Tuple[Pitch, Pitch, Pitch]):
+        if not pitches[0] <= pitches[1] <= pitches[2]:
+            pitches = tuple(sorted(pitches))
+        self.pitches = pitches
+
+    def __hash__(self):
+        return hash(self.pitches)
+
+    def __eq__(self, other):
+        return self.pitches == other.pitches
+
+    def __str__(self):
+        pitch_names = [str(p) for p in self.pitches]
+        return f"({' '.join(pitch_names)})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
 if __name__ == "__main__":
     sounds, _ = midi.initialize()
 
