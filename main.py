@@ -1,36 +1,26 @@
-import discoversounds
+from discoversounds import (
+    query_sound,
+    Section,
+    Instrument,
+    Articulation,
+)
 import midi
 from midi import Player
 
-try:
-    from entities import Section, Instrument, Articulation
-except ImportError:
-    print("entities.py does not existing. Generating...")
-    import codegen
-
-    codegen.codegen_entities_py()
-
-
-def initialize():
-    sounds = discoversounds.read_sounds()
-    output_ports = midi.open_ports()
-    discoversounds.route_sounds(sounds, output_ports)
-    return sounds
-
 
 if __name__ == "__main__":
-    sounds = initialize()
+    sounds, _ = midi.initialize()
 
-    basses = discoversounds.query_sound(
+    basses = query_sound(
         sounds, Section.STRINGS, Instrument.BASSES, Articulation.SPICCATO
     )
-    celli = discoversounds.query_sound(
+    celli = query_sound(
         sounds, Section.STRINGS, Instrument.CELLI, Articulation.SPICCATO
     )
-    violas = discoversounds.query_sound(
+    violas = query_sound(
         sounds, Section.STRINGS, Instrument.VIOLAS, Articulation.SPICCATO
     )
-    violins = discoversounds.query_sound(
+    violins = query_sound(
         sounds, Section.STRINGS, Instrument.VIOLINS_1, Articulation.SPICCATO
     )
 

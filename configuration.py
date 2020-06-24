@@ -1,4 +1,6 @@
 class Configuration(object):
+    """Environment information such as virtual port names, CSV files."""
+
     virtual_ports = [
         "loopMIDI Port 1 1",
         "loopMIDI Port 2 2",

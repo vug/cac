@@ -5,11 +5,25 @@ from music21.pitch import Pitch
 import rtmidi
 
 from configuration import Configuration
-from entities import Section, Instrument, Articulation
+
+try:
+    from entities import Section, Instrument, Articulation
+except ModuleNotFoundError:
+    print("entities.py does not existing. Generating...")
+    import codegen
+
+    codegen.codegen_entities_py()
+    from entities import Section, Instrument, Articulation
 
 
 @dataclass
 class Sound(object):
+    """Represents a BBC Symphony Orchestra Preset.
+
+    Also knows MIDI port and channel to send MIDI messages
+    to play that preset.
+    """
+
     long_name: str
     section: Section
     instrument: Instrument
@@ -29,6 +43,7 @@ class Sound(object):
 
 
 def read_sounds():
+    """Read from CSV file and create Sound objects."""
     with open(Configuration.ranges_file) as csv_file:
         reader = csv.reader(csv_file, delimiter=",")
         next(reader)
@@ -57,19 +72,9 @@ def read_sounds():
     return sounds
 
 
-def route_sounds(sounds, ports):
-    cpp = Configuration.channels_per_port
-    if len(ports) * cpp <= len(sounds):
-        raise Exception(
-            f"Not enough ports. There are {len(sounds)} sounds, and {len(ports)} ports."
-            "One port has only {cpp} channels."
-        )
-    for ix, sound in enumerate(sounds):
-        sound.channel = ix % cpp
-        sound.port = ports[ix // cpp]
-
-
 def query_sound(sounds, section, instrument, articulation):
+    """Search a sound with given attributes."""
+
     def does_match(snd):
         return (
             snd.section == section
