@@ -1,3 +1,7 @@
+from collections import deque
+from typing import Callable, List, Tuple
+
+from music21.pitch import Pitch
 from discoversounds import (
     query_sound,
     Section,
@@ -31,6 +35,33 @@ class Triplet(object):
 
     def __repr__(self):
         return self.__str__()
+
+
+def get_next_triplets1(curr: Triplet) -> List[Triplet]:
+    pitches = (curr.pitches[0], curr.pitches[1], curr.pitches[2].transpose(2))
+    succ = Triplet(pitches)
+    if succ.pitches[2] < Pitch("C4"):
+        return [succ]
+    else:
+        return []
+
+
+def construct_graph(init: Triplet, next_states_func: Callable, steps: int):
+    q = deque([init])
+    vertices = set()
+    edges = set()
+    while q and steps > 0:
+        for _ in range(len(q)):
+            curr = q.pop()
+            vertices.add(curr)
+            for succ in next_states_func(curr):
+                edges.add((curr, succ))
+                if succ not in vertices and succ not in q:
+                    q.appendleft(succ)
+        steps -= 1
+    G = nx.DiGraph()
+    G.add_edges_from(edges)
+    return G
 
 
 if __name__ == "__main__":
