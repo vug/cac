@@ -132,9 +132,7 @@ def main():
 
     sounds, _ = midi.initialize()
 
-    basses = query_sound(
-        sounds, Section.STRINGS, Instrument.BASSES, Articulation.SPICCATO
-    )
+    _ = query_sound(sounds, Section.STRINGS, Instrument.BASSES, Articulation.SPICCATO)
     celli = query_sound(
         sounds, Section.STRINGS, Instrument.CELLI, Articulation.SPICCATO
     )
@@ -145,9 +143,7 @@ def main():
         sounds, Section.STRINGS, Instrument.VIOLINS_1, Articulation.SPICCATO
     )
 
-    tuba = query_sound(
-        sounds, Section.BRASS, Instrument.TUBA, Articulation.STACCATISSIMO
-    )
+    _ = query_sound(sounds, Section.BRASS, Instrument.TUBA, Articulation.STACCATISSIMO)
     trombones = query_sound(
         sounds, Section.BRASS, Instrument.TENOR_TROMBONES_A3, Articulation.STACCATISSIMO
     )
