@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Callable, List, Tuple, Set
+from typing import Callable, Tuple, Set
 
 from music21.pitch import Pitch
 from music21.scale import MajorScale
@@ -13,6 +13,7 @@ from discoversounds import (
 )
 import midi
 from midi import Player
+from visualization import plot_hierarchical_graph
 
 
 class Triplet(object):
@@ -40,15 +41,6 @@ class Triplet(object):
 
     def __repr__(self):
         return self.__str__()
-
-
-def get_next_triplets1(curr: Triplet) -> List[Triplet]:
-    pitches = (curr.pitches[0], curr.pitches[1], curr.pitches[2].transpose(2))
-    succ = Triplet(pitches)
-    if succ.pitches[2] < Pitch("C4"):
-        return [succ]
-    else:
-        return []
 
 
 all_pitches = MajorScale(tonic="C").getPitches("C1", "C8")
@@ -86,7 +78,9 @@ def filter_triplets(curr, successors):
     pass
 
 
-def construct_graph(init: Triplet, next_states_func: Callable, steps: int):
+def construct_graph(
+    init: Triplet, next_states_func: Callable, steps: int
+) -> Tuple[Set[Triplet], Set[Tuple[Triplet, Triplet]]]:
     q = deque([init])
     vertices = set()
     edges = set()
@@ -100,37 +94,16 @@ def construct_graph(init: Triplet, next_states_func: Callable, steps: int):
                 if succ not in vertices and succ not in q:
                     q.appendleft(succ)
         steps -= 1
-    G = nx.DiGraph()
-    G.add_edges_from(edges)
-    return G
-
-
-def plot_graph(G):
-    import matplotlib.pyplot as plt
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    pos = nx.nx_agraph.graphviz_layout(G, prog="dot")
-    nx.draw(
-        G,
-        pos,
-        with_labels=True,
-        arrows=False,
-        width=0.2,
-        ax=ax,
-        node_size=10,
-        alpha=0.5,
-        font_size=4,
-    )
-    plt.tight_layout()
-    plt.show()
+    return vertices, edges
 
 
 def main():
     init_pitches = (Pitch("C2"), Pitch("C3"), Pitch("C4"))
     init_triplet = Triplet(init_pitches)
-    G = construct_graph(init_triplet, get_next_triplets, 48)
-    plot_graph(G)
-    return
+    _, edges = construct_graph(init_triplet, get_next_triplets, 48)
+    G = nx.DiGraph()
+    G.add_edges_from(edges)
+    plot_hierarchical_graph(G)  # blocking
 
     progression = []
     chord = init_triplet
@@ -185,49 +158,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-def main1():
-    sounds, _ = midi.initialize()
-    p = Player()
-    for i, snd in enumerate(sounds[:5]):
-        middle_no = (snd.low_no + snd.high_no) // 2
-        p.schedule(snd, middle_no, i * 0.2, 0.2, 100)
-    p.play()
-
-
-def main2():
-    from typing import NamedTuple, Tuple
-
-    class Triplet(NamedTuple):
-        pitches: Tuple[Pitch, Pitch, Pitch]
-
-    pitches = (Pitch("a2"), Pitch("b2"), Pitch("b2"))
-    # pitches = ("a2", "b2", "b2")
-    t1 = Triplet(pitches=pitches)
-    t2 = Triplet(pitches=pitches)
-    # t3 = Triplet2(pitches=pitches)
-    # t4 = Triplet2(pitches=pitches)
-    d = {t1: 1, t2: 2}
-    # d = {t3: 3, t4: 4}
-    print(d, id(t1), id(t2), hash(t1), hash(t2))
-    # print(t3, id(t3), hash(t3))
-
-
-def main3():
-    init_pitches = (Pitch("C2"), Pitch("C3"), Pitch("G3"))
-    init_triplet = Triplet(init_pitches)
-    successors = get_next_triplets(init_triplet)
-    print(init_triplet, successors)
-    G = construct_graph(init_triplet, get_next_triplets1, 2)
-    print(G.edges)
-
-
-def main4():
-    init_pitches = (Pitch("C2"), Pitch("C3"), Pitch("C4"))
-    init_triplet = Triplet(init_pitches)
-    G = construct_graph(init_triplet, get_next_triplets, 5)
-    print(G.has_node(init_triplet))
-    print(G.edges)
-    plot_graph(G)
-    print(list(G.successors(init_triplet)))

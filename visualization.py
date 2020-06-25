@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 from music21.pitch import Pitch
+import networkx as nx
 
 from entities import Section
 
@@ -29,5 +30,23 @@ def plot_instrument_ranges(sounds):
     ax.set_xticklabels([Pitch(no) for no in xticks], rotation=0)
     ax.grid(axis="x", which="major")
     ax.set_title("Instrument Ranges")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_hierarchical_graph(G):
+    fig, ax = plt.subplots(figsize=(15, 15))
+    pos = nx.nx_agraph.graphviz_layout(G, prog="dot")
+    nx.draw(
+        G,
+        pos,
+        with_labels=True,
+        arrows=False,
+        width=0.2,
+        ax=ax,
+        node_size=10,
+        alpha=0.5,
+        font_size=4,
+    )
     plt.tight_layout()
     plt.show()
