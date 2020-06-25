@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Set
 
 from music21.pitch import Pitch
 from music21.scale import MajorScale
@@ -22,15 +22,17 @@ class Triplet(object):
     but have same hashes and are equal."""
 
     def __init__(self, pitches: Tuple[Pitch, Pitch, Pitch]):
+        # maybe compare their midi numbers.
         if not pitches[0] <= pitches[1] <= pitches[2]:
             pitches = tuple(sorted(pitches))
         self.pitches = pitches
+        self.midi_nos = tuple(p.midi for p in pitches)
 
     def __hash__(self):
-        return hash(self.pitches)
+        return hash(self.midi_nos)
 
     def __eq__(self, other):
-        return self.pitches == other.pitches
+        return self.midi_nos == other.midi_nos
 
     def __str__(self):
         pitch_names = [str(p) for p in self.pitches]
@@ -49,27 +51,35 @@ def get_next_triplets1(curr: Triplet) -> List[Triplet]:
         return []
 
 
-def get_next_triplets(triplet: Triplet) -> List[Triplet]:
-    all_pitches = MajorScale(tonic="C").getPitches("C1", "C8")
+all_pitches = MajorScale(tonic="C").getPitches("C1", "C8")
+pitch2index = {p: ix for ix, p in enumerate(all_pitches)}
+C2 = Pitch("C2")
+C3 = Pitch("C3")
+C4 = Pitch("C4")
+C5 = Pitch("C5")
+C6 = Pitch("C6")
+
+
+def get_next_triplets(triplet: Triplet) -> Set[Triplet]:
     next_triplets = set()
     for i, pitch in enumerate(triplet.pitches):
         # TODO: improve construct_graph to accept negative values here
         for diff in [1]:
             # TODO: make this a utility function
-            moved_pitch = all_pitches[all_pitches.index(pitch) + diff]
+            moved_pitch = all_pitches[pitch2index[pitch] + diff]
             if moved_pitch in triplet.pitches:
                 continue
-            next_pitches = list(triplet.pitches).copy()
-            next_pitches[i] = moved_pitch
-            next_pitches = tuple(next_pitches)
-            if not Pitch("C2") <= next_pitches[0] <= Pitch("C4"):
-                continue
-            if not Pitch("C3") <= next_pitches[1] <= Pitch("C5"):
-                continue
-            if not Pitch("C4") <= next_pitches[2] <= Pitch("C6"):
+            next_pitches = tuple(
+                p if i != j else moved_pitch for j, p in enumerate(triplet.pitches)
+            )
+            if (
+                not C2 <= next_pitches[0] <= C4
+                or not C3 <= next_pitches[1] <= C5
+                or not C4 <= next_pitches[2] <= C6
+            ):
                 continue
             next_triplets.add(Triplet(next_pitches))
-    return list(next_triplets)
+    return next_triplets
 
 
 def filter_triplets(curr, successors):
@@ -84,7 +94,8 @@ def construct_graph(init: Triplet, next_states_func: Callable, steps: int):
         for _ in range(len(q)):
             curr = q.pop()
             vertices.add(curr)
-            for succ in next_states_func(curr):
+            successors = next_states_func(curr)
+            for succ in successors:
                 edges.add((curr, succ))
                 if succ not in vertices and succ not in q:
                     q.appendleft(succ)
@@ -110,6 +121,7 @@ def plot_graph(G):
         alpha=0.5,
         font_size=4,
     )
+    plt.tight_layout()
     plt.show()
 
 
@@ -118,6 +130,7 @@ def main():
     init_triplet = Triplet(init_pitches)
     G = construct_graph(init_triplet, get_next_triplets, 48)
     plot_graph(G)
+    return
 
     progression = []
     chord = init_triplet
